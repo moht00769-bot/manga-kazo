@@ -1,0 +1,28 @@
+name: Manga-Auto-Update
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+      - name: Install Libs
+        run: pip install cloudscraper beautifulsoup4
+      - name: Run Scraper
+        run: python scraper.py
+      - name: Save Data
+        run: |
+          git config --global user.name "KazoBot"
+          git config --global user.email "bot@github.com"
+          git add data.json
+          git commit -m "تحديث تلقائي" || exit 0
+          git push
+
