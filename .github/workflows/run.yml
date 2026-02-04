@@ -14,15 +14,15 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Install Libs
-        run: pip install cloudscraper beautifulsoup4
+      - name: Install Dependencies
+        run: |
+          pip install cloudscraper beautifulsoup4 requests
       - name: Run Scraper
         run: python scraper.py
-      - name: Save Data
+      - name: Commit and Push
         run: |
-          git config --global user.name "KazoBot"
+          git config --global user.name "Mohammed-Elfagih-Bot"
           git config --global user.email "bot@github.com"
           git add data.json
-          git commit -m "تحديث تلقائي" || exit 0
+          git commit -m "تحديث الفصول بواسطة محمد الفقيه" || exit 0
           git push
-
