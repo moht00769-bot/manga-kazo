@@ -1,8 +1,8 @@
 name: Manga-Auto-Update
 on:
+  workflow_dispatch:
   schedule:
     - cron: '0 */6 * * *'
-  workflow_dispatch:
 permissions:
   contents: write
 jobs:
@@ -14,15 +14,19 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-      - name: Install Dependencies
-        run: |
-          pip install cloudscraper beautifulsoup4 requests
+      - name: Install Libs
+        run: pip install cloudscraper beautifulsoup4
       - name: Run Scraper
         run: python scraper.py
-      - name: Commit and Push
+      - name: Save Data
         run: |
-          git config --global user.name "Mohammed-Elfagih-Bot"
+          git config --global user.name "KazoBot"
           git config --global user.email "bot@github.com"
-          git add data.json
-          git commit -m "تحديث الفصول بواسطة محمد الفقيه" || exit 0
-          git push
+          # إضافة شرط التأكد من وجود الملف قبل الرفع
+          if [ -f data.json ]; then
+            git add data.json
+            git commit -m "Auto Update" || echo "No changes"
+            git push
+          else
+            echo "File data.json not found, skipping..."
+          fi
