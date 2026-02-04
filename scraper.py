@@ -1,68 +1,49 @@
 import cloudscraper
 from bs4 import BeautifulSoup
 import json
-import time
+import os
 
 def start_scraping():
-    # إنشاء متصفح وهمي متطور لتجاوز الحماية
-    scraper = cloudscraper.create_scraper(
-        browser={'browser': 'chrome','platform': 'windows','mobile': False}
-    )
-    
+    # استخدام متصفح وهمي لتجاوز الحماية
+    scraper = cloudscraper.create_scraper(browser={'browser': 'chrome','platform': 'windows','mobile': False})
     url = "https://mangalek.com" 
     
     try:
-        print("🚀 محاولة سحب البيانات من الموقع...")
-        # إضافة headers إضافية للتمويه
-        headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36'
-        }
-        res = scraper.get(url, headers=headers, timeout=30)
-        
-        if res.status_code != 200:
-            print(f"❌ فشل الاتصال. كود الحالة: {res.status_code}")
-            return
-
+        print("🔍 محاولة سحب البيانات...")
+        res = scraper.get(url, timeout=30)
         soup = BeautifulSoup(res.text, "html.parser")
         manga_data = []
 
-        # البحث عن العناصر (تأكدنا من المسارات الصحيحة للموقع)
+        # البحث عن المانجا
         items = soup.select('.page-item-detail, .manga-item')
         
-        for index, item in enumerate(items[:20]): # سحب أول 20 مانجا
+        for index, item in enumerate(items[:20]):
             title_el = item.select_one('h3 a')
             img_el = item.select_one('img')
-            
             if title_el and img_el:
-                title = title_el.get_text(strip=True)
-                m_url = title_el['href']
                 img = img_el.get('data-src') or img_el.get('src') or ""
                 if img.startswith('//'): img = "https:" + img
-                
                 manga_data.append({
-                    "id": index + 1000,
-                    "title": title,
+                    "id": index + 1,
+                    "title": title_el.get_text(strip=True),
                     "cover": img,
-                    "url": m_url,
+                    "url": title_el['href'],
                     "chapter": "فصل جديد",
-                    "rating": "4.9",
-                    "age": "+13",
                     "translator": {"name": "Mohammed Elfagih", "insta": "Gremory807"}
                 })
 
-        # حفظ الملف حتى لو القائمة فارغة لتجنب خطأ السيرفر
+        # التأكد من إنشاء الملف دائماً لمنع خطأ السيرفر
         if not manga_data:
-            print("⚠️ لم يتم العثور على مانجا، جاري وضع بيانات تجريبية")
-            manga_data = [{"id": 1, "title": "جاري التحديث...", "cover": "", "url": "#"}]
+            print("⚠️ لم نجد بيانات، سنضع بيانات مؤقتة")
+            manga_data = [{"id": 0, "title": "جاري التحديث...", "cover": "", "url": "#"}]
 
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump(manga_data, f, ensure_ascii=False, indent=2)
-        
-        print(f"✅ تم إنشاء ملف data.json بنجاح وبداخله {len(manga_data)} مانجا")
+        print(f"✅ تم إنشاء data.json بنجاح!")
 
     except Exception as e:
-        print(f"❌ خطأ تقني: {e}")
-        # إنشاء ملف فارغ لمنع تعطل السيرفر
+        print(f"❌ خطأ: {e}")
+        # إنشاء ملف فارغ إجبارياً لمنع السيرفر من الانهيار
         with open('data.json', 'w', encoding='utf-8') as f:
             json.dump([], f)
 
