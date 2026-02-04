@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="description" content="أفضل موقع مانجا بترجمة محمد الفقيه">
+    <title>Manga Pro | كازو</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        /* --- 1. الأساسيات القوية --- */
+        :root {
+            --bg-main: #0a0a0a; --bg-card: #141414; --accent: #e50914; --text: #fff; --text-gray: #b3b3b3;
+            --shadow: 0 4px 15px rgba(0,0,0,0.5); --radius: 12px;
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body { margin: 0; background: var(--bg-main); color: var(--text); font-family: 'Cairo', sans-serif; overflow-x: hidden; padding-bottom: 80px; }
+        a { text-decoration: none; color: inherit; }
+
+        /* --- 2. الهيدر المطور --- */
+        header { background: rgba(20,20,20,0.95); backdrop-filter: blur(10px); padding: 15px; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid #333; }
+        .nav-container { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; }
+        .logo { font-size: 1.8rem; font-weight: 900; color: var(--accent); letter-spacing: -1px; }
+        .logo span { color: #fff; }
+        
+        /* --- 3. البحث الذكي --- */
+        .search-wrapper { position: relative; width: 100%; max-width: 400px; margin: 0 15px; }
+        .search-input { width: 100%; background: #222; border: 1px solid #333; padding: 12px 40px 12px 20px; border-radius: 50px; color: #fff; font-family: 'Cairo'; transition: 0.3s; }
+        .search-input:focus { border-color: var(--accent); box-shadow: 0 0 15px rgba(229,9,20,0.3); }
+        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #777; }
+
+        /* --- 4. التصنيفات والفلترة --- */
+        .filters { padding: 15px; display: flex; gap: 10px; overflow-x: auto; scrollbar-width: none; max-width: 1400px; margin: 0 auto; }
+        .filter-btn { background: #222; color: #fff; border: 1px solid #333; padding: 8px 20px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; }
+        .filter-btn.active, .filter-btn:hover { background: var(--accent); border-color: var(--accent); }
+
+        /* --- 5. شبكة المانجا --- */
+        .grid-container { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; padding: 15px; max-width: 1400px; margin: 0 auto; }
+        
+        .card { background: var(--bg-card); border-radius: var(--radius); overflow: hidden; position: relative; transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); border: 1px solid transparent; }
+        .card:hover { transform: translateY(-10px) scale(1.02); border-color: var(--accent); z-index: 2; box-shadow: 0 10px 30px rgba(229,9,20,0.2); }
+
+        .card-img-wrap { position: relative; padding-top: 145%; overflow: hidden; }
+        .card-img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover .card-img { transform: scale(1.1); filter: brightness(0.7); }
+
+        /* شارات مميزة */
+        .badge { position: absolute; top: 10px; padding: 4px 8px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; z-index: 2; }
+        .badge-rating { left: 10px; background: #fbbf24; color: #000; }
+        .badge-age { right: 10px; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); color: #fff; border: 1px solid #555; }
+
+        /* معلومات البطاقة */
+        .card-info { padding: 12px; position: relative; }
+        .card-title { font-size: 0.95rem; font-weight: 700; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-meta { display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-gray); }
+        .chapter-num { color: var(--accent); font-weight: bold; }
+
+        /* حقوق المترجم */
+        .translator-credit { font-size: 0.7rem; color: #777; margin-top: 8px; border-top: 1px solid #222; padding-top: 5px; display: flex; align-items: center; gap: 5px; }
+        .insta-link { color: #E1306C; font-weight: bold; }
+
+        /* أزرار التفاعل */
+        .card-actions { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; gap: 10px; opacity: 0; transition: 0.3s; z-index: 3; }
+        .card:hover .card-actions { opacity: 1; top: 45%; }
+        .action-btn { width: 40px; height: 40px; border-radius: 50%; border: none; background: #fff; color: #000; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
+        .action-btn:hover { background: var(--accent); color: #fff; }
+        .action-btn.fav-btn.active { color: var(--accent); background: #fff; }
+
+        /* --- 6. رسائل النظام والتحميل --- */
+        .loader { text-align: center; padding: 40px; color: var(--text-gray); display: none; }
+        .status-msg { text-align: center; padding: 50px; font-size: 1.2rem; color: #777; }
+
+        /* --- 7. القائمة السفلية للموبايل --- */
+        .bottom-nav { position: fixed; bottom: 0; left: 0; width: 100%; background: #141414; border-top: 1px solid #333; display: flex; justify-content: space-around; padding: 10px; z-index: 1000; }
+        .nav-item { color: #777; font-size: 1.5rem; background: none; border: none; cursor: pointer; }
+        .nav-item.active { color: var(--accent); }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <div class="logo">MANGA<span>PRO</span></div>
+            <div class="search-wrapper">
+                <input type="text" class="search-input" id="searchInput" placeholder="ابحث عن مانجا...">
+                <span class="search-icon">🔍</span>
+            </div>
+        </div>
+    </header>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filterData('all')">الكل</button>
+        <button class="filter-btn" onclick="filterData('fav')">❤ المفضلة</button>
+        <button class="filter-btn" onclick="filterData('top')">🔥 الأعلى تقييماً</button>
+        <button class="filter-btn" onclick="filterData('adult')">+17 فقط</button>
+    </div>
+
+    <div class="grid-container" id="mangaGrid">
+        </div>
+
+    <div class="loader" id="loader">جاري تحميل المزيد من الفصول...</div>
+    <div class="status-msg" id="statusMsg"></div>
+
+    <div class="bottom-nav">
+        <button class="nav-item active" onclick="window.scrollTo(0,0)">🏠</button>
+        <button class="nav-item" onclick="filterData('fav')">❤</button>
+        <button class="nav-item" onclick="toggleTheme()">🌓</button>
+    </div>
+
+    <script>
+        // --- تهيئة النظام ---
+        let allManga = [];
+        let filteredManga = [];
+        let favorites = JSON.parse(localStorage.getItem('kz_favs')) || [];
+        let currentPage = 1;
+        const ITEMS_PER_PAGE = 20;
+
+        // --- 1. جلب البيانات ---
+        async function initApp() {
+            document.getElementById('loader').style.display = 'block';
+            try {
+                const response = await fetch('data.json?t=' + new Date().getTime()); // منع الكاش
+                if (!response.ok) throw new Error("ملف البيانات غير جاهز");
+                allManga = await response.json();
+                
+                // خلط البيانات قليلاً لتبدو ديناميكية
+                allManga.sort(() => Math.random() - 0.5);
+                
+                filteredManga = [...allManga];
+                renderGrid(true);
+            } catch (e) {
+                document.getElementById('statusMsg').innerHTML = `
+                    <h3>⚠️ تنبيه النظام</h3>
+                    <p>الموقع جديد! يتم الآن جلب المانجا تلقائياً.</p>
+                    <p>يرجى الانتظار دقيقة وتحديث الصفحة.</p>
+                `;
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+
+        // --- 2. محرك العرض (Rendering Engine) ---
+        function renderGrid(reset = false) {
+            const grid = document.getElementById('mangaGrid');
+            if (reset) {
+                grid.innerHTML = '';
+                currentPage = 1;
+            }
+
+            const start = (currentPage - 1) * ITEMS_PER_PAGE;
+            const end = start + ITEMS_PER_PAGE;
+            const chunk = filteredManga.slice(start, end);
+
+            if (chunk.length === 0 && reset) {
+                grid.innerHTML = '<p style="grid-column:1/-1; text-align:center">لا توجد نتائج.</p>';
+                return;
+            }
+
+            chunk.forEach(m => {
+                const isFav = favorites.includes(m.id);
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-wrap">
+                        <img src="${m.cover}" class="card-img" loading="lazy" alt="${m.title}" onerror="this.src='https://via.placeholder.com/300x450?text=Error'">
+                        <span class="badge badge-rating">★ ${m.rating}</span>
+                        <span class="badge badge-age">${m.age}</span>
+                        <div class="card-actions">
+                            <a href="${m.url}" target="_blank" class="action-btn" title="قراءة الآن">👁️</a>
+                            <button class="action-btn fav-btn ${isFav ? 'active' : ''}" onclick="toggleFav(this, ${m.id})">
+                                ${isFav ? '❤' : '🤍'}
+                            </button>
+                        </div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-title">${m.title}</div>
+                        <div class="card-meta">
+                            <span class="chapter-num">${m.chapter}</span>
+                            <span>${getTimeAgo(m.timestamp)}</span>
+                        </div>
+                        <div class="translator-credit">
+                            <span>ترجمة: ${m.translator.name}</span>
+                            <a href="${m.translator.insta_url}" target="_blank" class="insta-link">@${m.translator.insta}</a>
+                        </div>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        // --- 3. الوظائف الأساسية ---
+        function toggleFav(btn, id) {
+            if (favorites.includes(id)) {
+                favorites = favorites.filter(f => f !== id);
+                btn.innerHTML = '🤍';
+                btn.classList.remove('active');
+            } else {
+                favorites.push(id);
+                btn.innerHTML = '❤';
+                btn.classList.add('active');
+            }
+            localStorage.setItem('kz_favs', JSON.stringify(favorites));
+        }
+
+        function filterData(type) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+
+            if (type === 'all') filteredManga = [...allManga];
+            else if (type === 'fav') filteredManga = allManga.filter(m => favorites.includes(m.id));
+            else if (type === 'top') filteredManga = allManga.filter(m => parseFloat(m.rating) >= 4.5);
+            else if (type === 'adult') filteredManga = allManga.filter(m => m.age === '+17');
+            
+            renderGrid(true);
+        }
+
+        // بحث فوري
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            filteredManga = allManga.filter(m => m.title.toLowerCase().includes(val));
+            renderGrid(true);
+        });
+
+        // سحب لانهائي
+        window.addEventListener('scroll', () => {
+            if (window.innerHeight + window.scrollY >= document.body.offsetHeight - 500) {
+                if (filteredManga.length > currentPage * ITEMS_PER_PAGE) {
+                    currentPage++;
+                    renderGrid(false);
+                }
+            }
+        });
+
+        // وظائف مساعدة
+        function getTimeAgo(timestamp) {
+            // محاكاة للتوقيت
+            return "منذ ساعة"; 
+        }
+
+        function toggleTheme() {
+            // يمكن إضافة تبديل ألوان CSS هنا
+            alert("سيتم تفعيل الوضع النهاري في التحديث القادم حفاظاً على راحة العين حالياً بالوضع الليلي.");
+        }
+
+        // تشغيل
+        initApp();
+
+    </script>
+</body>
+</html>
